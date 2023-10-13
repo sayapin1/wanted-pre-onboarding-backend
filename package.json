@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "test": "jest --forceExit",
+    "test:silent": "jest --silent --forceExit",
+    "test:coverage": "jest --coverage --forceExit",
+    "test:unit": "jest __tests__/unit --forceExit",
     "start": "nodemon app.js"
   },
   "dependencies": {

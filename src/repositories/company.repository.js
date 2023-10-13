@@ -29,10 +29,11 @@ class CompanyRepository {
 
   updateRecruitmentNotice = async (recruitmentId, updateFields) => {
     try {
-      const recruitment = await this.recruitmentModel.findByPk(recruitmentId);
-
-      Object.assign(recruitment, updateFields);
-      await recruitment.save();
+      await this.recruitmentModel.update(updateFields, {
+        where: {
+          id: recruitmentId,
+        },
+      });
     } catch (error) {
       throw error;
     }
