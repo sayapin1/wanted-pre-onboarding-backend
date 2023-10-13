@@ -40,6 +40,15 @@ describe("CompanyRepository", () => {
 
       expect(mockRecruitmentModel.create).toHaveBeenCalledWith(recruitmentData);
     });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockRecruitmentModel.create.mockRejectedValue(mockError);
+
+      await expect(companyRepository.postRecruitmentNotice()).rejects.toThrow(
+        mockError
+      );
+    });
   });
 
   describe("updateRecruitmentNotice", () => {
@@ -56,8 +65,6 @@ describe("CompanyRepository", () => {
         country: "Test Country",
       };
 
-      mockRecruitmentModel.findByPk.mockResolvedValue(mockRecruitment);
-
       await companyRepository.updateRecruitmentNotice(
         recruitmentId,
         updateFields
@@ -66,6 +73,15 @@ describe("CompanyRepository", () => {
       expect(mockRecruitmentModel.update).toHaveBeenCalledWith(updateFields, {
         where: { id: recruitmentId },
       });
+    });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockRecruitmentModel.update.mockRejectedValue(mockError);
+
+      await expect(companyRepository.updateRecruitmentNotice()).rejects.toThrow(
+        mockError
+      );
     });
   });
 
@@ -79,6 +95,15 @@ describe("CompanyRepository", () => {
       expect(mockRecruitmentModel.destroy).toHaveBeenCalledWith({
         where: { id: recruitmentId },
       });
+    });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockRecruitmentModel.destroy.mockRejectedValue(mockError);
+
+      await expect(companyRepository.deleteRecruitmentNotice()).rejects.toThrow(
+        mockError
+      );
     });
   });
 });

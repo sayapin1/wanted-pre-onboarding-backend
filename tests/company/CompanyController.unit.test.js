@@ -13,16 +13,19 @@ const mockResponse = {
   json: jest.fn(),
 };
 
+let mockNext;
+
 describe("CompanyController", () => {
   let companyController;
 
   beforeEach(() => {
     companyController = new CompanyController();
     companyController.companyService = mockCompanyService;
+    mockNext = jest.fn();
   });
 
   describe("postRecruitmentNotice", () => {
-    test("should call CompanyService.postRecruitmentNotice with the correct arguments", async () => {
+    beforeEach(() => {
       mockRequest = {
         body: {
           companyName: "Test Company",
@@ -34,6 +37,8 @@ describe("CompanyController", () => {
           detail: "Test Detail",
         },
       };
+    });
+    test("should call CompanyService.postRecruitmentNotice with the correct arguments", async () => {
       const mockResponseValue = {
         code: 200,
         message: "Recruitment notice posted successfully",
@@ -43,7 +48,11 @@ describe("CompanyController", () => {
         mockResponseValue
       );
 
-      await companyController.postRecruitmentNotice(mockRequest, mockResponse);
+      await companyController.postRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
 
       expect(mockCompanyService.postRecruitmentNotice).toHaveBeenCalledWith(
         mockRequest.body.companyName,
@@ -59,14 +68,26 @@ describe("CompanyController", () => {
         message: mockResponseValue.message,
       });
     });
+
+    test("should handle errors by calling the next middleware", async () => {
+      const mockError = new Error("Internal server error");
+      mockCompanyService.postRecruitmentNotice.mockRejectedValue(mockError);
+
+      await companyController.postRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockNext).toHaveBeenCalledWith(mockError);
+    });
   });
 
   describe("updateRecruitmentNotice", () => {
-    test("should call CompanyService.updateRecruitmentNotice with the correct arguments", async () => {
-      const recruitmentId = "test-id";
+    beforeEach(() => {
       mockRequest = {
         params: {
-          recruitmentId,
+          recruitmentId: "test-id",
         },
         body: {
           companyName: "Test Company",
@@ -78,6 +99,8 @@ describe("CompanyController", () => {
           detail: "Test Detail",
         },
       };
+    });
+    test("should call CompanyService.updateRecruitmentNotice with the correct arguments", async () => {
       const mockResponseValue = {
         code: 200,
         message: "Recruitment notice updated successfully",
@@ -89,11 +112,12 @@ describe("CompanyController", () => {
 
       await companyController.updateRecruitmentNotice(
         mockRequest,
-        mockResponse
+        mockResponse,
+        mockNext
       );
 
       expect(mockCompanyService.updateRecruitmentNotice).toHaveBeenCalledWith(
-        recruitmentId,
+        mockRequest.params.recruitmentId,
         {
           companyName: mockRequest.body.companyName,
           country: mockRequest.body.country,
@@ -109,16 +133,29 @@ describe("CompanyController", () => {
         message: mockResponseValue.message,
       });
     });
+
+    test("should handle errors by calling the next middleware", async () => {
+      const mockError = new Error("Internal server error");
+      mockCompanyService.updateRecruitmentNotice.mockRejectedValue(mockError);
+
+      await companyController.updateRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockNext).toHaveBeenCalledWith(mockError);
+    });
   });
 
   describe("deleteRecruitmentNotice", () => {
+    const recruitmentId = "test-id";
+    mockRequest = {
+      params: {
+        recruitmentId,
+      },
+    };
     test("should call CompanyService.deleteRecruitmentNotice with the correct argument", async () => {
-      const recruitmentId = "test-id";
-      mockRequest = {
-        params: {
-          recruitmentId,
-        },
-      };
       const mockResponseValue = {
         code: 200,
         message: "Recruitment notice deleted successfully",
@@ -130,7 +167,8 @@ describe("CompanyController", () => {
 
       await companyController.deleteRecruitmentNotice(
         mockRequest,
-        mockResponse
+        mockResponse,
+        mockNext
       );
 
       expect(mockCompanyService.deleteRecruitmentNotice).toHaveBeenCalledWith(
@@ -140,6 +178,19 @@ describe("CompanyController", () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         message: mockResponseValue.message,
       });
+    });
+
+    test("should handle errors by calling the next middleware", async () => {
+      const mockError = new Error("Internal server error");
+      mockCompanyService.deleteRecruitmentNotice.mockRejectedValue(mockError);
+
+      await companyController.deleteRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
 });
