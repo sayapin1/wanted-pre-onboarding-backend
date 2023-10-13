@@ -90,8 +90,8 @@ class UserRepository {
   applyRecruitment = async (recruitmentId, userId) => {
     try {
       await this.appicationModel.create({
-        userId: userId,
-        recruitmentId: recruitmentId,
+        userId,
+        recruitmentId,
       });
     } catch (error) {
       throw error;

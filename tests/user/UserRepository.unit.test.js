@@ -30,12 +30,12 @@ const mockApplicationsData = [
   { userId: 2, recruitmentId: 2 },
 ];
 
-const recruitmentModel = {
+const mockRecruitmentModel = {
   findAll: jest.fn(),
   findOne: jest.fn(),
 };
 
-const applicationModel = {
+const mockApplicationModel = {
   create: jest.fn(),
   findOne: jest.fn(),
 };
@@ -44,16 +44,19 @@ describe("UserRepository", () => {
   let userRepository;
 
   beforeEach(() => {
-    userRepository = new UserRepository(recruitmentModel, applicationModel);
+    userRepository = new UserRepository(
+      mockRecruitmentModel,
+      mockApplicationModel
+    );
   });
 
   describe("getRecruitmentNotices", () => {
     test("should return all recruitment notices without detail and timestamps", async () => {
-      recruitmentModel.findAll.mockResolvedValue(mockRecruitmentData);
+      mockRecruitmentModel.findAll.mockResolvedValue(mockRecruitmentData);
 
       const response = await userRepository.getRecruitmentNotices();
 
-      expect(recruitmentModel.findAll).toHaveBeenCalled();
+      expect(mockRecruitmentModel.findAll).toHaveBeenCalled();
       const expectedResponse = mockRecruitmentData.map((data) =>
         expect.objectContaining({
           id: data.id,
@@ -67,11 +70,20 @@ describe("UserRepository", () => {
       );
       expect(response).toEqual(expectedResponse);
     });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockRecruitmentModel.findAll.mockRejectedValue(mockError);
+
+      await expect(userRepository.getRecruitmentNotices()).rejects.toThrow(
+        mockError
+      );
+    });
   });
 
   describe("searchRecruitmentNotice", () => {
     test("should search for recruitment notices with the given query and return filtered results", async () => {
-      recruitmentModel.findAll.mockResolvedValue(mockRecruitmentData);
+      mockRecruitmentModel.findAll.mockResolvedValue(mockRecruitmentData);
 
       const query = "Test Company 1";
       const filteredData = mockRecruitmentData.filter((r) =>
@@ -90,7 +102,7 @@ describe("UserRepository", () => {
 
       const response = await userRepository.searchRecruitmentNotice(query);
 
-      expect(recruitmentModel.findAll).toHaveBeenCalledWith(
+      expect(mockRecruitmentModel.findAll).toHaveBeenCalledWith(
         expect.objectContaining({
           where: whereClause,
           attributes: {
@@ -117,17 +129,26 @@ describe("UserRepository", () => {
 
       expect(response).toEqual(expectedResponse);
     });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockRecruitmentModel.findAll.mockRejectedValue(mockError);
+
+      await expect(userRepository.searchRecruitmentNotice()).rejects.toThrow(
+        mockError
+      );
+    });
   });
 
   describe("getOneRecruitmentNotice", () => {
     test("should return a single recruitment notice by ID without timestamps", async () => {
       const mockId = 1;
       const mockRecruitment = mockRecruitmentData.find((r) => r.id === mockId);
-      recruitmentModel.findOne.mockResolvedValue(mockRecruitment);
+      mockRecruitmentModel.findOne.mockResolvedValue(mockRecruitment);
 
       const response = await userRepository.getOneRecruitmentNotice(mockId);
 
-      expect(recruitmentModel.findOne).toHaveBeenCalledWith({
+      expect(mockRecruitmentModel.findOne).toHaveBeenCalledWith({
         where: {
           id: mockId,
         },
@@ -144,11 +165,11 @@ describe("UserRepository", () => {
 
     test("should return null if no recruitment notice is found", async () => {
       const mockId = 3;
-      recruitmentModel.findOne.mockResolvedValue(null);
+      mockRecruitmentModel.findOne.mockResolvedValue(null);
 
       const response = await userRepository.getOneRecruitmentNotice(mockId);
 
-      expect(recruitmentModel.findOne).toHaveBeenCalledWith({
+      expect(mockRecruitmentModel.findOne).toHaveBeenCalledWith({
         where: {
           id: mockId,
         },
@@ -158,38 +179,92 @@ describe("UserRepository", () => {
       });
       expect(response).toBeNull();
     });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockRecruitmentModel.findOne.mockRejectedValue(mockError);
+
+      await expect(userRepository.getOneRecruitmentNotice()).rejects.toThrow(
+        mockError
+      );
+    });
+  });
+
+  describe("getAllRecruitmentNoticesByCompany", () => {
+    test("should return an array of recruitment notice IDs for a given company", async () => {
+      const companyName = "Test Company";
+      const mockRecruitmentNotices = [
+        { id: 1, companyName: "Test Company" },
+        { id: 2, companyName: "Test Company" },
+      ];
+
+      mockRecruitmentModel.findAll.mockResolvedValueOnce(
+        mockRecruitmentNotices
+      );
+
+      const result = await userRepository.getAllRecruitmentNoticesByCompany(
+        companyName
+      );
+
+      expect(mockRecruitmentModel.findAll).toHaveBeenCalledWith({
+        attributes: ["id"],
+        where: { companyName: companyName },
+      });
+
+      expect(result).toEqual([1, 2]);
+    });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const companyName = "Test Company";
+      const mockError = new Error("Database connection error");
+
+      mockRecruitmentModel.findAll.mockRejectedValueOnce(mockError);
+
+      await expect(
+        userRepository.getAllRecruitmentNoticesByCompany(companyName)
+      ).rejects.toThrow(mockError);
+    });
   });
 
   describe("applyRecruitment", () => {
+    const userId = 1;
+    const recruitmentId = 1;
     test("should create an application record", async () => {
-      const userId = 1;
-      const recruitmentId = 1;
-      userRepository.appicationModel = applicationModel;
+      mockApplicationModel.create.mockResolvedValue({ userId, recruitmentId });
 
       await userRepository.applyRecruitment(recruitmentId, userId);
 
-      expect(applicationModel.create).toHaveBeenCalledWith({
+      expect(mockApplicationModel.create).toHaveBeenCalledWith({
         userId,
         recruitmentId,
       });
     });
+
+    test("should throw an error if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockApplicationModel.create.mockRejectedValue(mockError);
+
+      await expect(userRepository.applyRecruitment()).rejects.toThrow(
+        mockError
+      );
+    });
   });
 
   describe("checkIfApplied", () => {
+    const userId = 1;
+    const recruitmentId = 2;
     test("should return true if an application exists for the given user and recruitment", async () => {
-      const userId = 1;
-      const recruitmentId = 1;
       const mockApplication = mockApplicationsData.find(
         (app) => app.userId === userId && app.recruitmentId === recruitmentId
       );
-      applicationModel.findOne.mockResolvedValue(mockApplication);
+      mockApplicationModel.findOne.mockResolvedValue(mockApplication);
 
       const response = await userRepository.checkIfApplied(
         recruitmentId,
         userId
       );
 
-      expect(applicationModel.findOne).toHaveBeenCalledWith({
+      expect(mockApplicationModel.findOne).toHaveBeenCalledWith({
         where: {
           userId,
           recruitmentId,
@@ -199,22 +274,28 @@ describe("UserRepository", () => {
     });
 
     test("should return false if no application exists for the given user and recruitment", async () => {
-      const userId = 1;
-      const recruitmentId = 2;
-      applicationModel.findOne.mockResolvedValue(null);
+      mockApplicationModel.findOne.mockResolvedValue(null);
 
       const response = await userRepository.checkIfApplied(
         recruitmentId,
         userId
       );
 
-      expect(applicationModel.findOne).toHaveBeenCalledWith({
+      expect(mockApplicationModel.findOne).toHaveBeenCalledWith({
         where: {
           userId,
           recruitmentId,
         },
       });
       expect(response).toBe(false);
+    });
+
+    test("should return false if an error occurs during the process", async () => {
+      const mockError = new Error("Database connection error");
+      mockApplicationModel.findOne.mockRejectedValue(mockError);
+
+      const result = await userRepository.checkIfApplied(recruitmentId, userId);
+      expect(result).toBe(false);
     });
   });
 });
