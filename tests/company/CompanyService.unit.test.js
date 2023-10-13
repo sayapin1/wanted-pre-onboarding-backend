@@ -61,6 +61,25 @@ describe("CompanyService", () => {
       );
       expect(response).toEqual(mockResponseValue);
     });
+
+    test("should return error message when recruitment notice posting fails", async () => {
+      const mockError = new Error("Database connection error");
+      mockCompanyRepository.postRecruitmentNotice = jest
+        .fn()
+        .mockRejectedValue(mockError);
+
+      const response = await companyService.postRecruitmentNotice(
+        companyName,
+        country,
+        area,
+        position,
+        compensation,
+        skill,
+        detail
+      );
+
+      expect(response).toEqual({ code: 500, message: "채용공고 등록 실패" });
+    });
   });
 
   describe("updateRecruitmentNotice", () => {
@@ -86,6 +105,36 @@ describe("CompanyService", () => {
       ).toHaveBeenCalledWith(recruitmentId, updateFields);
       expect(response).toEqual(mockResponseValue);
     });
+
+    test("should return not found message when recruitment notice does not exist", async () => {
+      const mockReturnValue = {
+        code: 404,
+        message: "채용공고가 존재하지 않습니다.",
+      };
+      mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(false);
+
+      const response = await companyService.updateRecruitmentNotice(
+        recruitmentId,
+        updateFields
+      );
+
+      expect(response).toEqual(mockReturnValue);
+    });
+
+    test("should return error message when recruitment notice update fails", async () => {
+      const mockError = new Error("Database connection error");
+      mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(true);
+      mockCompanyRepository.updateRecruitmentNotice = jest
+        .fn()
+        .mockRejectedValue(mockError);
+
+      const response = await companyService.updateRecruitmentNotice(
+        recruitmentId,
+        updateFields
+      );
+
+      expect(response).toEqual({ code: 500, message: "채용공고 수정 실패" });
+    });
   });
 
   describe("deleteRecruitmentNotice", () => {
@@ -109,6 +158,36 @@ describe("CompanyService", () => {
         mockCompanyRepository.deleteRecruitmentNotice
       ).toHaveBeenCalledWith(recruitmentId);
       expect(response).toEqual(mockResponseValue);
+    });
+
+    test("should return not found message when recruitment notice does not exist", async () => {
+      const mockReturnValue = {
+        code: 404,
+        message: "채용공고가 존재하지 않습니다.",
+      };
+      mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(false);
+
+      const response = await companyService.deleteRecruitmentNotice(
+        recruitmentId,
+        updateFields
+      );
+
+      expect(response).toEqual(mockReturnValue);
+    });
+
+    test("should return error message when recruitment notice deletion fails", async () => {
+      const mockError = new Error("Database connection error");
+      mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(true);
+      mockCompanyRepository.deleteRecruitmentNotice = jest
+        .fn()
+        .mockRejectedValue(mockError);
+
+      const response = await companyService.deleteRecruitmentNotice(
+        recruitmentId,
+        updateFields
+      );
+
+      expect(response).toEqual({ code: 500, message: "채용공고 삭제 실패." });
     });
   });
 });
