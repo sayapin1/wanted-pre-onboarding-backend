@@ -28,6 +28,7 @@ Node.js 및 필요한 라이브러리 설치
 'POST api/company/recruitment'
 
 요청
+
 {
   "companyName": "example name",
   "country": "example country",
@@ -37,7 +38,9 @@ Node.js 및 필요한 라이브러리 설치
   "skill": "example",
   "detail": "example content"
 }
+
 응답
+
 {
   "message": "채용공고 등록 완료"
 }
@@ -46,10 +49,13 @@ Node.js 및 필요한 라이브러리 설치
 'PUT api/company/recruitment/:recruitmentId'
 
 요청
+
 {
   "skill": "example"
 }
+
 응답
+
 {
   "message": "채용공고 수정 완료."
 }
@@ -58,6 +64,7 @@ Node.js 및 필요한 라이브러리 설치
 'DELETE api/company/recruitment/:recruitmentId'
 
 응답
+
 {
   "message": "채용공고 삭제 완료."
 }
@@ -68,6 +75,7 @@ Node.js 및 필요한 라이브러리 설치
 'GET api/user/recruitment'
 
 응답
+
 {
   "data": [
     {
@@ -95,6 +103,7 @@ Node.js 및 필요한 라이브러리 설치
 'GET api/user/recruitment/search?keyword={keyword}'
 
 응답
+
 {
   "data": [
     {
@@ -113,6 +122,7 @@ Node.js 및 필요한 라이브러리 설치
 'GET api/user/recruitment/:recruitmentId'
 
 응답
+
 {
   "data": {
     "recruitmentDetail": {
@@ -136,6 +146,7 @@ Node.js 및 필요한 라이브러리 설치
 'POST api/user/recruitment/:recruitmentId'
 
 응답
+
 {
   "message": "지원 완료되었습니다."
 }
