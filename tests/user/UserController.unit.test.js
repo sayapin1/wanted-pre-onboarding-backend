@@ -1,5 +1,4 @@
-const UserService = require("../services/user.service");
-const UserController = require("../controllers/user.controller");
+const UserController = require("../../src/controllers/user.controller");
 
 const mockUserService = {
   getRecruitmentNotices: jest.fn(),
@@ -13,7 +12,7 @@ const mockResponse = {
   status: jest.fn(() => mockResponse),
   json: jest.fn(),
 };
-const next = jest.fn();
+const mockNext = jest.fn();
 
 describe("UserController", () => {
   let userController;
@@ -37,7 +36,7 @@ describe("UserController", () => {
       await userController.getRecruitmentNotices(
         mockRequest,
         mockResponse,
-        next
+        mockNext
       );
 
       expect(mockUserService.getRecruitmentNotices).toHaveBeenCalled();
@@ -45,6 +44,43 @@ describe("UserController", () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         data: mockResponseValue.data,
       });
+    });
+
+    test("should return a message when data does not exist in the response", async () => {
+      const mockResponseValue = {
+        code: 404,
+        message: "No recruitment notices found",
+      };
+
+      mockUserService.getRecruitmentNotices.mockResolvedValueOnce(
+        mockResponseValue
+      );
+
+      await userController.getRecruitmentNotices(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockUserService.getRecruitmentNotices).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(mockResponseValue.code);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: mockResponseValue.message,
+      });
+    });
+
+    test("should handle errors by calling the next middleware", async () => {
+      const mockError = new Error("Internal server error");
+      mockUserService.getRecruitmentNotices.mockRejectedValueOnce(mockError);
+
+      await userController.getRecruitmentNotices(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockUserService.getRecruitmentNotices).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
 
@@ -69,7 +105,7 @@ describe("UserController", () => {
       await userController.searchRecruitmentNotice(
         mockRequest,
         mockResponse,
-        next
+        mockNext
       );
 
       expect(mockUserService.searchRecruitmentNotice).toHaveBeenCalledWith(
@@ -79,6 +115,43 @@ describe("UserController", () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         data: mockResponseValue.data,
       });
+    });
+
+    test("should return a message when data does not exist in the response", async () => {
+      const mockResponseValue = {
+        code: 404,
+        message: "No recruitment notices found",
+      };
+
+      mockUserService.searchRecruitmentNotice.mockResolvedValueOnce(
+        mockResponseValue
+      );
+
+      await userController.searchRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockUserService.searchRecruitmentNotice).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(mockResponseValue.code);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: mockResponseValue.message,
+      });
+    });
+
+    test("should handle errors by calling the next middleware", async () => {
+      const mockError = new Error("Internal server error");
+      mockUserService.searchRecruitmentNotice.mockRejectedValueOnce(mockError);
+
+      await userController.searchRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockUserService.searchRecruitmentNotice).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
 
@@ -103,7 +176,7 @@ describe("UserController", () => {
       await userController.getOneRecruitmentNotice(
         mockRequest,
         mockResponse,
-        next
+        mockNext
       );
 
       expect(mockUserService.getOneRecruitmentNotice).toHaveBeenCalledWith(
@@ -113,6 +186,43 @@ describe("UserController", () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         data: mockResponseValue.data,
       });
+    });
+
+    test("should return a message when data does not exist in the response", async () => {
+      const mockResponseValue = {
+        code: 404,
+        message: "No recruitment notices found",
+      };
+
+      mockUserService.getOneRecruitmentNotice.mockResolvedValueOnce(
+        mockResponseValue
+      );
+
+      await userController.getOneRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockUserService.getOneRecruitmentNotice).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(mockResponseValue.code);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: mockResponseValue.message,
+      });
+    });
+
+    test("should handle errors by calling the next middleware", async () => {
+      const mockError = new Error("Internal server error");
+      mockUserService.getOneRecruitmentNotice.mockRejectedValueOnce(mockError);
+
+      await userController.getOneRecruitmentNotice(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockUserService.getOneRecruitmentNotice).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
 
@@ -133,7 +243,11 @@ describe("UserController", () => {
 
       mockUserService.applyRecruitment.mockResolvedValueOnce(mockResponseValue);
 
-      await userController.applyRecruitment(mockRequest, mockResponse, next);
+      await userController.applyRecruitment(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
 
       expect(mockUserService.applyRecruitment).toHaveBeenCalledWith(
         recruitmentId,
@@ -143,6 +257,20 @@ describe("UserController", () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         message: mockResponseValue.message,
       });
+    });
+
+    test("should handle errors by calling the next middleware", async () => {
+      const mockError = new Error("Internal server error");
+      mockUserService.applyRecruitment.mockRejectedValueOnce(mockError);
+
+      await userController.applyRecruitment(
+        mockRequest,
+        mockResponse,
+        mockNext
+      );
+
+      expect(mockUserService.applyRecruitment).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
 });
