@@ -1,0 +1,36 @@
+### 채용공고 등록
+POST localhost:3000/api/company/recruitment
+Content-Type: application/json
+
+{
+  "companyName": "원티드",
+  "country": "한국",
+  "area": "서울",
+  "position": "프론트엔드 신입 개발자",
+  "compensation": "3000만원",
+  "skill": "리액트",
+  "detail": "원티드 본사에서 프론트 신입 개발자를 채용합니다."
+}
+
+### 채용공고 수정
+PUT localhost:3000/api/company/recruitment/1
+Content-Type: application/json
+
+{
+  "skill": "javascript"
+}
+
+###채용공고 삭제
+DELETE localhost:3000/api/company/recruitment/1
+
+### 모든 채용공고 확인
+GET localhost:3000/api/user/recruitment
+
+### 채용공고 검색
+GET localhost:3000/api/user/recruitment/search?keyword=백엔드
+
+### 채용공고 상세페이지
+GET localhost:3000/api/user/recruitment/2
+
+### 채용공고 지원
+POST localhost:3000/api/user/recruitment/2
