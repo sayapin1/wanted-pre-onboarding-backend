@@ -17,8 +17,8 @@ const mockCommonRepository = {
 };
 
 const searchQuery = "Test Query";
-const recruitmentId = "test-id";
-const userId = "test-user";
+const mockRecruitmentId = "test-id";
+const mockUserId = "test-user";
 
 describe("UserService", () => {
   let userService;
@@ -43,6 +43,20 @@ describe("UserService", () => {
       expect(mockUserRepository.getRecruitmentNotices).toHaveBeenCalled();
       expect(response).toEqual(mockResponseValue);
     });
+
+    test("should return error message when recruitment notice retrieval fails", async () => {
+      const mockError = new Error("Database connection error");
+      mockUserRepository.getRecruitmentNotices = jest
+        .fn()
+        .mockRejectedValue(mockError);
+
+      const result = await userService.getRecruitmentNotices();
+
+      expect(result).toEqual({
+        code: 500,
+        message: "채용공고 불러오기에 실패하였습니다.",
+      });
+    });
   });
 
   describe("searchRecruitmentNotice", () => {
@@ -61,6 +75,35 @@ describe("UserService", () => {
       );
       expect(response).toEqual(mockResponseValue);
     });
+
+    test("should return not found message when no recruitment notice is found", async () => {
+      const mockSearchQuery = "Nonexistent Query";
+      mockUserRepository.searchRecruitmentNotice = jest
+        .fn()
+        .mockResolvedValue(null);
+
+      const result = await userService.searchRecruitmentNotice(mockSearchQuery);
+
+      expect(result).toEqual({
+        code: 404,
+        message: "찾는 채용공고가 없습니다.",
+      });
+    });
+
+    test("should return error message when recruitment notice search fails", async () => {
+      const mockSearchQuery = "Test Query";
+      const mockError = new Error("Database connection error");
+      mockUserRepository.searchRecruitmentNotice = jest
+        .fn()
+        .mockRejectedValue(mockError);
+
+      const result = await userService.searchRecruitmentNotice(mockSearchQuery);
+
+      expect(result).toEqual({
+        code: 500,
+        message: "채용공고 검색에 실패하였습니다.",
+      });
+    });
   });
 
   describe("getOneRecruitmentNotice", () => {
@@ -75,15 +118,49 @@ describe("UserService", () => {
         []
       );
 
-      const response = await userService.getOneRecruitmentNotice(recruitmentId);
+      const response = await userService.getOneRecruitmentNotice(
+        mockRecruitmentId
+      );
 
       expect(mockUserRepository.getOneRecruitmentNotice).toHaveBeenCalledWith(
-        recruitmentId
+        mockRecruitmentId
       );
       expect(
         mockUserRepository.getAllRecruitmentNoticesByCompany
       ).toHaveBeenCalled();
       expect(response).toEqual(mockResponseValue);
+    });
+
+    test("should return not found message when recruitment detail does not exist", async () => {
+      mockUserRepository.getOneRecruitmentNotice = jest
+        .fn()
+        .mockResolvedValue(null);
+
+      const result = await userService.getOneRecruitmentNotice(
+        mockRecruitmentId
+      );
+
+      expect(result).toEqual({
+        code: 404,
+        message: "채용공고가 존재하지 않습니다.",
+      });
+    });
+
+    test("should return error message when retrieval fails", async () => {
+      const mockRecruitmentId = 1;
+      const mockError = new Error("Database connection error");
+      mockUserRepository.getOneRecruitmentNotice = jest
+        .fn()
+        .mockRejectedValue(mockError);
+
+      const result = await userService.getOneRecruitmentNotice(
+        mockRecruitmentId
+      );
+
+      expect(result).toEqual({
+        code: 500,
+        message: "채용공고 상세 페이지 불러오기에 실패하였습니다.",
+      });
     });
   });
 
@@ -99,22 +176,62 @@ describe("UserService", () => {
       mockUserRepository.applyRecruitment.mockResolvedValueOnce();
 
       const response = await userService.applyRecruitment(
-        recruitmentId,
-        userId
+        mockRecruitmentId,
+        mockUserId
       );
 
       expect(mockCommonRepository.findIfExisting).toHaveBeenCalledWith(
-        recruitmentId
+        mockRecruitmentId
       );
       expect(mockUserRepository.checkIfApplied).toHaveBeenCalledWith(
-        recruitmentId,
-        userId
+        mockRecruitmentId,
+        mockUserId
       );
       expect(mockUserRepository.applyRecruitment).toHaveBeenCalledWith(
-        recruitmentId,
-        userId
+        mockRecruitmentId,
+        mockUserId
       );
       expect(response).toEqual(mockResponseValue);
+    });
+
+    test("should return not found message when the recruitment does not exist", async () => {
+      mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(false);
+
+      const result = await userService.applyRecruitment(
+        mockRecruitmentId,
+        mockUserId
+      );
+
+      expect(result).toEqual({
+        code: 404,
+        message: "채용공고가 존재하지 않습니다.",
+      });
+    });
+
+    test("should return conflict message when the user has already applied for the recruitment", async () => {
+      mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(true);
+      mockUserRepository.checkIfApplied = jest.fn().mockResolvedValue(true);
+
+      const result = await userService.applyRecruitment(
+        mockRecruitmentId,
+        mockUserId
+      );
+
+      expect(result).toEqual({ code: 409, message: "이미 지원한 공고입니다." });
+    });
+
+    test("should return error message when the application process fails", async () => {
+      const mockError = new Error("Database connection error");
+      mockCommonRepository.findIfExisting = jest
+        .fn()
+        .mockRejectedValue(mockError);
+
+      const result = await userService.applyRecruitment(
+        mockRecruitmentId,
+        mockUserId
+      );
+
+      expect(result).toEqual({ code: 500, message: "지원에 실패하였습니다." });
     });
   });
 });
