@@ -22,7 +22,7 @@ class UserService {
       const data = await this.userRepository.searchRecruitmentNotice(
         searchQuery
       );
-      if (!data) {
+      if (data.length === 0) {
         return { code: 404, message: "찾는 채용공고가 없습니다." };
       }
 
