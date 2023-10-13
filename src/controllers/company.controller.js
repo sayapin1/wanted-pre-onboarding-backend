@@ -67,11 +67,15 @@ class CompanyController {
 
   //채용공고 삭제
   deleteRecruitmentNotice = async (req, res, next) => {
-    const { recruitmentId } = req.params;
-    const response = await this.companyService.deleteRecruitmentNotice(
-      recruitmentId
-    );
-    res.status(response.code).json({ message: response.message });
+    try {
+      const { recruitmentId } = req.params;
+      const response = await this.companyService.deleteRecruitmentNotice(
+        recruitmentId
+      );
+      res.status(response.code).json({ message: response.message });
+    } catch (error) {
+      next(error);
+    }
   };
 }
 
