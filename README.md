@@ -1,3 +1,4 @@
+
 # wanted-pre-onboarding-backend
 
 **주요 기능**
@@ -61,7 +62,7 @@ Node.js 및 필요한 라이브러리 설치
   "message": "채용공고 삭제 완료."
 }
 
-사용자 관련 API
+**사용자 관련 API**
 
 모든 채용공고 확인
 'GET api/user/recruitment'
