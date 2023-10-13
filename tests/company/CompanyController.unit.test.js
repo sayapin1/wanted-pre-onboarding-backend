@@ -13,7 +13,7 @@ const mockResponse = {
   json: jest.fn(),
 };
 
-let mockNext;
+const mockNext = jest.fn();
 
 describe("CompanyController", () => {
   let companyController;
@@ -21,7 +21,6 @@ describe("CompanyController", () => {
   beforeEach(() => {
     companyController = new CompanyController();
     companyController.companyService = mockCompanyService;
-    mockNext = jest.fn();
   });
 
   describe("postRecruitmentNotice", () => {

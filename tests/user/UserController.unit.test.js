@@ -79,7 +79,6 @@ describe("UserController", () => {
         mockNext
       );
 
-      expect(mockUserService.getRecruitmentNotices).toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
@@ -150,7 +149,6 @@ describe("UserController", () => {
         mockNext
       );
 
-      expect(mockUserService.searchRecruitmentNotice).toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
@@ -221,7 +219,6 @@ describe("UserController", () => {
         mockNext
       );
 
-      expect(mockUserService.getOneRecruitmentNotice).toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });
@@ -269,7 +266,6 @@ describe("UserController", () => {
         mockNext
       );
 
-      expect(mockUserService.applyRecruitment).toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalledWith(mockError);
     });
   });

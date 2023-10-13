@@ -1,8 +1,5 @@
 const UserService = require("../../src/services/user.service");
 
-const mockRecruitments = {};
-const mockApplications = {};
-
 const mockUserRepository = {
   getRecruitmentNotices: jest.fn(),
   searchRecruitmentNotice: jest.fn(),
@@ -50,9 +47,9 @@ describe("UserService", () => {
         .fn()
         .mockRejectedValue(mockError);
 
-      const result = await userService.getRecruitmentNotices();
+      const response = await userService.getRecruitmentNotices();
 
-      expect(result).toEqual({
+      expect(response).toEqual({
         code: 500,
         message: "채용공고 불러오기에 실패하였습니다.",
       });
@@ -78,16 +75,17 @@ describe("UserService", () => {
 
     test("should return not found message when no recruitment notice is found", async () => {
       const mockSearchQuery = "Nonexistent Query";
+      const mockReturnValue = {
+        code: 404,
+        message: "찾는 채용공고가 없습니다.",
+      };
       mockUserRepository.searchRecruitmentNotice = jest
         .fn()
         .mockResolvedValue(null);
 
       const result = await userService.searchRecruitmentNotice(mockSearchQuery);
 
-      expect(result).toEqual({
-        code: 404,
-        message: "찾는 채용공고가 없습니다.",
-      });
+      expect(result).toEqual(mockReturnValue);
     });
 
     test("should return error message when recruitment notice search fails", async () => {
@@ -97,9 +95,11 @@ describe("UserService", () => {
         .fn()
         .mockRejectedValue(mockError);
 
-      const result = await userService.searchRecruitmentNotice(mockSearchQuery);
+      const response = await userService.searchRecruitmentNotice(
+        mockSearchQuery
+      );
 
-      expect(result).toEqual({
+      expect(response).toEqual({
         code: 500,
         message: "채용공고 검색에 실패하였습니다.",
       });
@@ -132,6 +132,10 @@ describe("UserService", () => {
     });
 
     test("should return not found message when recruitment detail does not exist", async () => {
+      const mockReturnValue = {
+        code: 404,
+        message: "채용공고가 존재하지 않습니다.",
+      };
       mockUserRepository.getOneRecruitmentNotice = jest
         .fn()
         .mockResolvedValue(null);
@@ -140,14 +144,10 @@ describe("UserService", () => {
         mockRecruitmentId
       );
 
-      expect(result).toEqual({
-        code: 404,
-        message: "채용공고가 존재하지 않습니다.",
-      });
+      expect(result).toEqual(mockReturnValue);
     });
 
     test("should return error message when retrieval fails", async () => {
-      const mockRecruitmentId = 1;
       const mockError = new Error("Database connection error");
       mockUserRepository.getOneRecruitmentNotice = jest
         .fn()
@@ -195,6 +195,10 @@ describe("UserService", () => {
     });
 
     test("should return not found message when the recruitment does not exist", async () => {
+      const mockReturnValue = {
+        code: 404,
+        message: "채용공고가 존재하지 않습니다.",
+      };
       mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(false);
 
       const result = await userService.applyRecruitment(
@@ -202,13 +206,14 @@ describe("UserService", () => {
         mockUserId
       );
 
-      expect(result).toEqual({
-        code: 404,
-        message: "채용공고가 존재하지 않습니다.",
-      });
+      expect(result).toEqual(mockReturnValue);
     });
 
     test("should return conflict message when the user has already applied for the recruitment", async () => {
+      const mockReturnValue = {
+        code: 409,
+        message: "이미 지원한 공고입니다.",
+      };
       mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(true);
       mockUserRepository.checkIfApplied = jest.fn().mockResolvedValue(true);
 
@@ -217,7 +222,7 @@ describe("UserService", () => {
         mockUserId
       );
 
-      expect(result).toEqual({ code: 409, message: "이미 지원한 공고입니다." });
+      expect(result).toEqual(mockReturnValue);
     });
 
     test("should return error message when the application process fails", async () => {

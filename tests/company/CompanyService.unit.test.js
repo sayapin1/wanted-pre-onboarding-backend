@@ -1,7 +1,5 @@
 const CompanyService = require("../../src/services/company.service");
 
-const mockRecruitments = {};
-
 const mockCompanyRepository = {
   postRecruitmentNotice: jest.fn(),
   updateRecruitmentNotice: jest.fn(),
@@ -19,7 +17,8 @@ const position = "Test Position";
 const compensation = "Test Compensation";
 const skill = "Test Skill";
 const detail = "Test Detail";
-const recruitmentId = "test-id";
+
+const mockRecruitmentId = "test-id";
 const updateFields = {};
 
 describe("CompanyService", () => {
@@ -93,16 +92,16 @@ describe("CompanyService", () => {
       mockCompanyRepository.updateRecruitmentNotice.mockResolvedValueOnce();
 
       const response = await companyService.updateRecruitmentNotice(
-        recruitmentId,
+        mockRecruitmentId,
         updateFields
       );
 
       expect(mockCommonRepository.findIfExisting).toHaveBeenCalledWith(
-        recruitmentId
+        mockRecruitmentId
       );
       expect(
         mockCompanyRepository.updateRecruitmentNotice
-      ).toHaveBeenCalledWith(recruitmentId, updateFields);
+      ).toHaveBeenCalledWith(mockRecruitmentId, updateFields);
       expect(response).toEqual(mockResponseValue);
     });
 
@@ -114,7 +113,7 @@ describe("CompanyService", () => {
       mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(false);
 
       const response = await companyService.updateRecruitmentNotice(
-        recruitmentId,
+        mockRecruitmentId,
         updateFields
       );
 
@@ -129,7 +128,7 @@ describe("CompanyService", () => {
         .mockRejectedValue(mockError);
 
       const response = await companyService.updateRecruitmentNotice(
-        recruitmentId,
+        mockRecruitmentId,
         updateFields
       );
 
@@ -148,15 +147,15 @@ describe("CompanyService", () => {
       mockCompanyRepository.deleteRecruitmentNotice.mockResolvedValueOnce();
 
       const response = await companyService.deleteRecruitmentNotice(
-        recruitmentId
+        mockRecruitmentId
       );
 
       expect(mockCommonRepository.findIfExisting).toHaveBeenCalledWith(
-        recruitmentId
+        mockRecruitmentId
       );
       expect(
         mockCompanyRepository.deleteRecruitmentNotice
-      ).toHaveBeenCalledWith(recruitmentId);
+      ).toHaveBeenCalledWith(mockRecruitmentId);
       expect(response).toEqual(mockResponseValue);
     });
 
@@ -168,7 +167,7 @@ describe("CompanyService", () => {
       mockCommonRepository.findIfExisting = jest.fn().mockResolvedValue(false);
 
       const response = await companyService.deleteRecruitmentNotice(
-        recruitmentId,
+        mockRecruitmentId,
         updateFields
       );
 
@@ -183,7 +182,7 @@ describe("CompanyService", () => {
         .mockRejectedValue(mockError);
 
       const response = await companyService.deleteRecruitmentNotice(
-        recruitmentId,
+        mockRecruitmentId,
         updateFields
       );
 
