@@ -23,7 +23,7 @@ Node.js 및 필요한 라이브러리 설치
 
 ### **2. DB 스키마 설계**
 
-!(drawSQL-wanpro.png)
+!([drawSQL-wanpro.png](https://github.com/sayapin1/wanted-pre-onboarding-backend/blob/main/assets/drawSQL-wanpro.png))
 
 ### **3. API 엔드포인트 설계**
 
